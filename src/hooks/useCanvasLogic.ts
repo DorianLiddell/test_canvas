@@ -7,7 +7,8 @@ export const useCanvasLogic = () => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [shapes, setShapes] = useState<Shape[]>([]);
     const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
-    
+    const [selectedShapeType, setSelectedShapeType] = useState<Shape["type"]>("rectangle");
+
 
     const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
@@ -41,6 +42,7 @@ export const useCanvasLogic = () => {
     const handleCanvasClick = (e: KonvaEventObject<MouseEvent>) => {
         const stage = e.target.getStage();
         if (!stage) return;
+        
         const pointer = stage.getPointerPosition();
         if (!pointer) return;
 
@@ -48,29 +50,18 @@ export const useCanvasLogic = () => {
         ...prev,
         {
             id: `shape-${prev.length}`,
-            type: "rectangle",
-            x: pointer.x,
-            y: pointer.y,
+            type: selectedShapeType,
+            x: (pointer.x - stage.x()) / stage.scaleX(),
+            y: (pointer.y - stage.y()) / stage.scaleY(),
             width: 100,
             height: 100,
-            fill: "blue",
+            fill: selectedShapeType === "circle" ? "red" : selectedShapeType === "triangle" ? "green" : "blue",
         },
     ]);
     };
 
-    const addShape = (type: Shape["type"], x = 100, y = 100) => {
-        setShapes((prev) => [
-        ...prev,
-        {
-            id: `shape-${prev.length}`,
-            type,
-            x,
-            y,
-            width: 100,
-            height: 100,
-            fill: type === "circle" ? "red" : type === "triangle" ? "green" : "blue",
-        },
-        ]);
+    const selectShapeType = (type: Shape["type"]) => {
+        setSelectedShapeType(type);
     };
 
     const updateShapeProperties = (id: string, newProperties: Partial<Shape>) => {
@@ -78,17 +69,19 @@ export const useCanvasLogic = () => {
         prev.map((shape) => (shape.id === id ? { ...shape, ...newProperties } : shape))
         );
     };
+    
 
     return {
         scale,
         position,
         shapes,
         selectedShapeId,
+        selectedShapeType,
         handleWheel,
         handleDrag,
         handleCanvasClick,
         updateShapeProperties,
         setSelectedShapeId,
-        addShape,
+        selectShapeType,
     };
     };

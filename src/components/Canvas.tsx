@@ -9,19 +9,21 @@ export const Canvas: React.FC = () => {
     position,
     shapes,
     selectedShapeId,
+    selectedShapeType,
     handleWheel,
     handleDrag,
     handleCanvasClick,
     updateShapeProperties,
     setSelectedShapeId,
-    addShape,
+    selectShapeType,
     } = useCanvasLogic();
 
     return (
     <div style={{ display: "flex" }}>
         <Menu
+        selectedShapeType={selectedShapeType} 
+        onSelectShapeType={selectShapeType} 
         selectedShape={shapes.find((shape) => shape.id === selectedShapeId)}
-        onAddShape={addShape}
         onUpdateShape={updateShapeProperties}
         />
         <CanvasLayout
